@@ -6,10 +6,10 @@ router.get("/", function(req, res, next) {
     
     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM usuarios";
+    let sql = "SELECT * FROM cursos";
 
     if (busqueda) {
-        sql += " WHERE nombre like ?"
+        sql += " WHERE año like ?"
         busquedaParcial = `%${busqueda}%`
     }
 
@@ -24,12 +24,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
+    const {año, division, creado_por_id_admin} = req.body;
 
-    let sql = "INSERT INTO usuarios (documento, nombre, apellido, correo, password, rol)";
-    sql+= " VALUES (?, ?, ?, ?, ?, ?)";
+    let sql = "INSERT INTO cursos (año, division, creado_por_id_admin)";
+    sql+= " VALUES (?, ?, ?)";
 
-    db.query(sql, [documento, nombre, apellido, correo, password, rol])
+    db.query(sql, [año, division, creado_por_id_admin])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -39,10 +39,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:usuario_id", function (req, res, next) {
-    const {usuario_id} = req.params;
-    const sql = "DELETE FROM usuarios WHERE id = ?"
-    db.query(sql, [usuario_id])
+router.delete ("/:curso_id", function (req, res, next) {
+    const {curso_id} = req.params;
+    const sql = "DELETE FROM curso WHERE id = ?"
+    db.query(sql, [curso_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -52,11 +52,11 @@ router.delete ("/:usuario_id", function (req, res, next) {
     })
 })
 
-router.put ("/:usuario_id", function(req, res, next) {
-    const {usuario_id} = req.params;
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
-    const sql = "UPDATE usuarios SET documento = ?, nombre = ?, apellido = ?, correo = ?, password = ?, rol = ? WHERE id = ?"
-    db.query(sql, [documento, nombre, apellido, correo, password, rol, usuario_id])
+router.put ("/:curso_id", function(req, res, next) {
+    const {curso_id} = req.params;
+    const {año, division, creado_por_id_admin} = req.body;
+    const sql = "UPDATE cursos SET año = ?, division = ?, creado_por_id_admin = ? WHERE id = ?"
+    db.query(sql, [año, division, creado_por_id_admin, curso_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })

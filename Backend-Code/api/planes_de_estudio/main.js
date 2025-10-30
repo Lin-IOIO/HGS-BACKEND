@@ -6,10 +6,10 @@ router.get("/", function(req, res, next) {
     
     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM usuarios";
+    let sql = "SELECT * FROM planes_de_estudio";
 
     if (busqueda) {
-        sql += " WHERE nombre like ?"
+        sql += " WHERE creado_por_id_coordinador like ?"
         busquedaParcial = `%${busqueda}%`
     }
 
@@ -24,12 +24,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
+    const {} = req.body;
 
-    let sql = "INSERT INTO usuarios (documento, nombre, apellido, correo, password, rol)";
-    sql+= " VALUES (?, ?, ?, ?, ?, ?)";
+    let sql = "INSERT INTO tareas ()";
+    sql+= " VALUES (?)";
 
-    db.query(sql, [documento, nombre, apellido, correo, password, rol])
+    db.query(sql, [])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -39,10 +39,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:usuario_id", function (req, res, next) {
-    const {usuario_id} = req.params;
-    const sql = "DELETE FROM usuarios WHERE id = ?"
-    db.query(sql, [usuario_id])
+router.delete ("/:tarea_id", function (req, res, next) {
+    const {tarea_id} = req.params;
+    const sql = "DELETE FROM tareas WHERE id = ?"
+    db.query(sql, [tarea_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -52,11 +52,11 @@ router.delete ("/:usuario_id", function (req, res, next) {
     })
 })
 
-router.put ("/:usuario_id", function(req, res, next) {
-    const {usuario_id} = req.params;
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
-    const sql = "UPDATE usuarios SET documento = ?, nombre = ?, apellido = ?, correo = ?, password = ?, rol = ? WHERE id = ?"
-    db.query(sql, [documento, nombre, apellido, correo, password, rol, usuario_id])
+router.put ("/:tarea_id", function(req, res, next) {
+    const {tarea_id} = req.params;
+    const {} = req.body;
+    const sql = "UPDATE tareas SET ... WHERE id = ?"
+    db.query(sql, [])
     .then(()=>{
         res.status(200).send("actualizado")
     })
