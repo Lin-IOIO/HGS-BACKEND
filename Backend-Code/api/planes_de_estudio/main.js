@@ -24,12 +24,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    const {} = req.body;
+    const {archivo, creado_por_id_coordinador} = req.body;
 
-    let sql = "INSERT INTO tareas ()";
-    sql+= " VALUES (?)";
+    let sql = "INSERT INTO planes_de_estudio (archivo, creado_por_id_coordinador)";
+    sql+= " VALUES (?, ?)";
 
-    db.query(sql, [])
+    db.query(sql, [archivo, creado_por_id_coordinador])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -39,10 +39,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:tarea_id", function (req, res, next) {
-    const {tarea_id} = req.params;
-    const sql = "DELETE FROM tareas WHERE id = ?"
-    db.query(sql, [tarea_id])
+router.delete ("/:plan_id", function (req, res, next) {
+    const {plan_id} = req.params;
+    const sql = "DELETE FROM planes_de_estudio WHERE id = ?"
+    db.query(sql, [plan_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -52,11 +52,11 @@ router.delete ("/:tarea_id", function (req, res, next) {
     })
 })
 
-router.put ("/:tarea_id", function(req, res, next) {
-    const {tarea_id} = req.params;
-    const {} = req.body;
-    const sql = "UPDATE tareas SET ... WHERE id = ?"
-    db.query(sql, [])
+router.put ("/:plan_id", function(req, res, next) {
+    const {plan_id} = req.params;
+    const {archivo, creado_por_id_coordinador} = req.body;
+    const sql = "UPDATE tareas SET archivo = ?, creado_por_id_coordinador = ? WHERE id = ?"
+    db.query(sql, [archivo, creado_por_id_coordinador, plan_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })
