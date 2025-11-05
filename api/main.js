@@ -5,6 +5,7 @@ const tareasRouter = require('./tareas/main')
 const planesRouter = require('./planes_de_estudio/main')
 const materiasRouter = require('./materias_unicas_por_curso/main')
 const cursosRouter = require('./cursos/main')
+const turnosRouter = require('./turnos/main')
 
 function validarUsuario (req, res, next) {
     console.log('pasó por middleware');
@@ -22,6 +23,8 @@ router.use('/planes', validarUsuario, planesRouter)
 router.use('/materias', validarUsuario, materiasRouter)
 
 router.use('/cursos', validarUsuario, cursosRouter)
+
+router.use('/turnos', validarUsuario, turnosRouter)
 
 
 
