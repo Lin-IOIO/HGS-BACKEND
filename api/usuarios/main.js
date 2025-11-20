@@ -1,4 +1,9 @@
 const router = require('express').Router();
+const loginRouter = require("./login")
+const {hashpass} = require('@damianegreco/hashpass')
+
+router.use('./login', loginRouter)
+
 const db = require('../../conexion')
 
 router.get("/", function(req, res, next) {
@@ -29,7 +34,9 @@ router.post("/", function (req, res, next) {
     let sql = "INSERT INTO usuarios (documento, nombre, apellido, correo, password, rol)";
     sql+= " VALUES (?, ?, ?, ?, ?, ?)";
 
-    db.query(sql, [documento, nombre, apellido, correo, password, rol])
+    const hashedPassword = hashpass(password)
+
+    db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -56,7 +63,10 @@ router.put ("/:usuario_id", function(req, res, next) {
     const {usuario_id} = req.params;
     const {documento, nombre, apellido, correo, password, rol} = req.body;
     const sql = "UPDATE usuarios SET documento = ?, nombre = ?, apellido = ?, correo = ?, password = ?, rol = ? WHERE id = ?"
-    db.query(sql, [documento, nombre, apellido, correo, password, rol, usuario_id])
+
+    const hashedPassword = hashpass(password)
+
+    db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol, usuario_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })
