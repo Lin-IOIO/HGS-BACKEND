@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const validarUsuario = require('./middleware')
+const verificacionRoles = require('./verificarRoles')
 
 const usuariosRouter = require('./usuarios/main')
 const tareasRouter = require('./tareas/main')
@@ -6,25 +8,28 @@ const planesRouter = require('./planes_de_estudio/main')
 const materiasRouter = require('./materias_unicas_por_curso/main')
 const cursosRouter = require('./cursos/main')
 const turnosRouter = require('./turnos/main')
-
-function validarUsuario (req, res, next) {
-    console.log('pasó por middleware');
-    next();
-}
+const loginRouter = require("./usuarios/login")
+const asignaturasRouter = require("./asignaturas/main")
 
 
 
-router.use('/usuarios', validarUsuario, usuariosRouter)
 
-router.use('/tareas', validarUsuario, tareasRouter)
 
-router.use('/planes', validarUsuario, planesRouter)
+router.use('/login', loginRouter)
 
-router.use('/materias', validarUsuario, materiasRouter)
+router.use('/usuarios', validarUsuario, verificacionRoles(["admin"]), usuariosRouter)
 
-router.use('/cursos', validarUsuario, cursosRouter)
+router.use('/tareas', validarUsuario, verificacionRoles(["admin", "profesor"]), tareasRouter)
 
-router.use('/turnos', validarUsuario, turnosRouter)
+router.use('/planes', validarUsuario, verificacionRoles(["admin", "profesor", "coordinador"]), planesRouter)
+
+router.use('/materias', validarUsuario, verificacionRoles(["admin", "profesor", "coordinador"]), materiasRouter)
+
+router.use('/cursos', validarUsuario, verificacionRoles(["admin", "profesor", "coordinador"]), cursosRouter)
+
+router.use('/turnos', validarUsuario, verificacionRoles(["admin", "profesor", "coordinador"]), turnosRouter)
+
+router.use('/asignaturas', validarUsuario, verificacionRoles(["admin", "profesor", "coordinador"]), asignaturasRouter)
 
 
 

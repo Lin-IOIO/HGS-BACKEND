@@ -1,8 +1,5 @@
 const router = require('express').Router();
-const loginRouter = require("./login")
-const {hashpass} = require('@damianegreco/hashpass')
-
-router.use('./login', loginRouter)
+const {hashPass} = require('@damianegreco/hashpass')
 
 const db = require('../../conexion')
 
@@ -34,7 +31,7 @@ router.post("/", function (req, res, next) {
     let sql = "INSERT INTO usuarios (documento, nombre, apellido, correo, password, rol)";
     sql+= " VALUES (?, ?, ?, ?, ?, ?)";
 
-    const hashedPassword = hashpass(password)
+    const hashedPassword = hashPass(password)
 
     db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol])
     .then(()=> {

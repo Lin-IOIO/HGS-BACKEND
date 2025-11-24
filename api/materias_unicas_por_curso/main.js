@@ -24,12 +24,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    const {nombre, pertenece_a_id_curso, id_profesor_asignado} = req.body;
+    const {asignatura_id, pertenece_a_id_curso, id_profesor_asignado} = req.body;
 
-    let sql = "INSERT INTO materias_unicas_por_curso (nombre, pertenece_a_id_curso, id_profesor_asignado)";
+    let sql = "INSERT INTO materias_unicas_por_curso (asignatura_id, pertenece_a_id_curso, id_profesor_asignado)";
     sql+= " VALUES (?, ?, ?)";
 
-    db.query(sql, [nombre, pertenece_a_id_curso, id_profesor_asignado])
+    db.query(sql, [asignatura_id, pertenece_a_id_curso, id_profesor_asignado])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -54,9 +54,9 @@ router.delete ("/:materia_id", function (req, res, next) {
 
 router.put ("/:materia_id", function(req, res, next) {
     const {materia_id} = req.params;
-    const {nombre, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado} = req.body;
-    const sql = "UPDATE materias_unicas_por_curso SET nombre = ?, pertenece_a_id_curso = ?, id_profesor_asignado = ?, id_plan_de_estudio_asignado = ? WHERE id = ?"
-    db.query(sql, [nombre, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado, materia_id])
+    const {asignatura_id, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado} = req.body;
+    const sql = "UPDATE materias_unicas_por_curso SET asignatura_id = ?, pertenece_a_id_curso = ?, id_profesor_asignado = ?, id_plan_de_estudio_asignado = ? WHERE id = ?"
+    db.query(sql, [asignatura_id, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado, materia_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })
