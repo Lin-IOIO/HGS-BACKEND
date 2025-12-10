@@ -1,35 +1,89 @@
 const router = require('express').Router();
 const db = require('../../conexion')
 
-router.get("/", function(req, res, next) {
-    const { busqueda } = req.query;
+// router.get("/", function(req, res, next) {
+//     const { busqueda } = req.query;
     
-    let busquedaParcial = busqueda;
+//     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM cursos";
+//     let sql = "SELECT * FROM cursos";
+
+//     if (busqueda) {
+//         sql += " WHERE año like ?"
+//         busquedaParcial = `%${busqueda}%`
+//     }
+
+//     db.query(sql, [busquedaParcial])
+//     .then (([respuesta])=> {
+//         res.json({respuesta})
+//     })
+//     .catch((error)=> {
+//         console.error(error);
+//         res.status(500).send("ocurrió un error")
+//     })
+// })
+
+router.get("/", (req, res) => {
+    const { busqueda } = req.query;
+
+    let sql = `
+        SELECT 
+            c.id,
+            CONCAT(c.año, ' año - división ', c.division) AS nombre,
+            CASE c.turno
+            WHEN 1 THEN 'Mañana'
+            WHEN 2 THEN 'Tarde'
+            WHEN 3 THEN 'Vespertino'
+            ELSE 'Desconocido'
+            END AS turno,
+            COUNT(m.id) AS materias
+        FROM cursos c
+        LEFT JOIN materias_unicas_por_curso m
+            ON m.pertenece_a_id_curso = c.id
+    `;
+
+    let params = [];
 
     if (busqueda) {
-        sql += " WHERE año like ?"
-        busquedaParcial = `%${busqueda}%`
+        sql += " WHERE c.año LIKE ?";
+        params.push(`%${busqueda}%`);
     }
 
-    db.query(sql, [busquedaParcial])
-    .then (([respuesta])=> {
-        res.json({respuesta})
+    sql += " GROUP BY c.id";
+
+    db.query(sql, params)
+    .then(([rows]) => {
+        res.json(rows);
     })
-    .catch((error)=> {
+    .catch((error) => {
         console.error(error);
-        res.status(500).send("ocurrió un error")
+        res.status(500).send("Ocurrió un error");
+    });
+});
+
+router.get("/activos", (req, res) => {
+    const sql = `
+        SELECT COUNT(*) AS activos
+        FROM cursos
+    `;
+
+    db.query(sql)
+    .then(([rows]) => {
+        res.json(rows[0]);
     })
-})
+    .catch((error) => {
+        console.error(error);
+        res.status(500).send("ocurrió un error");
+    });
+});
 
 router.post("/", function (req, res, next) {
-    const {año, division, creado_por_id_admin} = req.body;
+    const {año, division, turno, creado_por_id_admin} = req.body;
 
-    let sql = "INSERT INTO cursos (año, division, creado_por_id_admin)";
-    sql+= " VALUES (?, ?, ?)";
+    let sql = "INSERT INTO cursos (año, division, turno, creado_por_id_admin)";
+    sql+= " VALUES (?,?, ?, ?)";
 
-    db.query(sql, [año, division, creado_por_id_admin])
+    db.query(sql, [año, division, turno, creado_por_id_admin])
     .then(()=> {
         res.status(201).send("Guardado");
     })

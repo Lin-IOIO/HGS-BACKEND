@@ -17,13 +17,46 @@ router.get("/", function(req, res, next) {
 
     db.query(sql, [busquedaParcial])
     .then (([respuesta])=> {
-        res.json({respuesta})
+        res.json(respuesta)
     })
     .catch((error)=> {
         console.error(error);
         res.status(500).send("ocurrió un error")
     })
 })
+
+router.get("/resumen", (req, res) => {
+    const sql = `
+        SELECT COUNT(*) AS total
+        FROM usuarios
+        WHERE rol = 'profesor' OR rol = 'coordinador'
+    `;
+
+    db.query(sql)
+    .then(([rows]) => {
+        res.json(rows[0]);
+    })
+    .catch((error) => {
+        console.error(error);
+        res.status(500).send("Ocurrió un error");
+    });
+});
+
+router.get("/activos", (req, res) => {
+    const sql = `
+        SELECT COUNT(*) AS total_cursos
+        FROM cursos
+    `;
+
+    db.query(sql)
+    .then(([rows]) => {
+        res.json(rows[0]);
+    })
+    .catch((error) => {
+        console.error(error);
+        res.status(500).send("ocurrió un error");
+    });
+});
 
 router.post("/", function (req, res, next) {
     const {documento, nombre, apellido, correo, password, rol} = req.body;

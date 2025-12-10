@@ -15,7 +15,7 @@ router.get("/", function(req, res, next) {
 
     db.query(sql, [busquedaParcial])
     .then (([respuesta])=> {
-        res.json({respuesta})
+        res.json(respuesta)
     })
     .catch((error)=> {
         console.error(error);
