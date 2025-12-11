@@ -42,6 +42,21 @@ router.get("/resumen", (req, res) => {
     });
 });
 
+router.get("/profesores", (req, res) => {
+    const sql = `
+        SELECT * FROM usuarios WHERE rol = 'profesor'
+    `;
+
+    db.query(sql)
+    .then(([rows]) => {
+        res.json(rows);
+    })
+    .catch((error) => {
+        console.error(error);
+        res.status(500).send("Ocurrió un error");
+    });
+});
+
 router.get("/activos", (req, res) => {
     const sql = `
         SELECT COUNT(*) AS total_cursos
@@ -94,7 +109,7 @@ router.put ("/:usuario_id", function(req, res, next) {
     const {documento, nombre, apellido, correo, password, rol} = req.body;
     const sql = "UPDATE usuarios SET documento = ?, nombre = ?, apellido = ?, correo = ?, password = ?, rol = ? WHERE id = ?"
 
-    const hashedPassword = hashpass(password)
+    const hashedPassword = hashPass(password)
 
     db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol, usuario_id])
     .then(()=>{

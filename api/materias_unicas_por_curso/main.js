@@ -24,6 +24,9 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
+    
+    console.log('Cuerpo de la solicitud (req.body):', req.body);
+
     const {asignatura_id, pertenece_a_id_curso, id_profesor_asignado} = req.body;
 
     let sql = "INSERT INTO materias_unicas_por_curso (asignatura_id, pertenece_a_id_curso, id_profesor_asignado)";

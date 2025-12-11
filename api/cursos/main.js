@@ -29,7 +29,10 @@ router.get("/", (req, res) => {
     let sql = `
         SELECT 
             c.id,
-            CONCAT(c.año, ' año - división ', c.division) AS nombre,
+            c.año AS anio_id,
+            c.division AS division_id,
+            c.turno AS turno_id,
+            CONCAT(c.año, '°- ', c.division, '°') AS nombre,
             CASE c.turno
             WHEN 1 THEN 'Mañana'
             WHEN 2 THEN 'Tarde'
@@ -95,7 +98,7 @@ router.post("/", function (req, res, next) {
 
 router.delete ("/:curso_id", function (req, res, next) {
     const {curso_id} = req.params;
-    const sql = "DELETE FROM curso WHERE id = ?"
+    const sql = "DELETE FROM cursos WHERE id = ?"
     db.query(sql, [curso_id])
     .then(()=>{
         res.status(200).send("eliminado");
@@ -108,9 +111,9 @@ router.delete ("/:curso_id", function (req, res, next) {
 
 router.put ("/:curso_id", function(req, res, next) {
     const {curso_id} = req.params;
-    const {año, division, creado_por_id_admin} = req.body;
-    const sql = "UPDATE cursos SET año = ?, division = ?, creado_por_id_admin = ? WHERE id = ?"
-    db.query(sql, [año, division, creado_por_id_admin, curso_id])
+    const {año, division, turno, creado_por_id_admin} = req.body;
+    const sql = "UPDATE cursos SET año = ?, division = ?, turno = ?, creado_por_id_admin = ? WHERE id = ?"
+    db.query(sql, [año, division, turno, creado_por_id_admin, curso_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })
