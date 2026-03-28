@@ -1,54 +1,27 @@
 const router = require('express').Router();
 const db = require('../../conexion')
 
-// router.get("/", function(req, res, next) {
-//     const { busqueda } = req.query;
-    
-//     let busquedaParcial = busqueda;
-
-//     let sql = "SELECT * FROM cursos";
-
-//     if (busqueda) {
-//         sql += " WHERE año like ?"
-//         busquedaParcial = `%${busqueda}%`
-//     }
-
-//     db.query(sql, [busquedaParcial])
-//     .then (([respuesta])=> {
-//         res.json({respuesta})
-//     })
-//     .catch((error)=> {
-//         console.error(error);
-//         res.status(500).send("ocurrió un error")
-//     })
-// })
-
 router.get("/", (req, res) => {
     const { busqueda } = req.query;
 
     let sql = `
         SELECT 
             c.id,
-            c.año AS anio_id,
+            c.anio AS anio_id,
             c.division AS division_id,
             c.turno AS turno_id,
-            CONCAT(c.año, '°- ', c.division, '°') AS nombre,
-            CASE c.turno
-            WHEN 1 THEN 'Mañana'
-            WHEN 2 THEN 'Tarde'
-            WHEN 3 THEN 'Vespertino'
-            ELSE 'Desconocido'
-            END AS turno,
+            CONCAT(c.anio, '�- ', c.division, '�') AS nombre,
+            c.turno AS turno,
             COUNT(m.id) AS materias
-        FROM cursos c
-        LEFT JOIN materias_unicas_por_curso m
-            ON m.pertenece_a_id_curso = c.id
+        FROM curso c
+        LEFT JOIN curso_materia m
+            ON m.id_curso = c.id
     `;
 
     let params = [];
 
     if (busqueda) {
-        sql += " WHERE c.año LIKE ?";
+        sql += " WHERE c.anio LIKE ?";
         params.push(`%${busqueda}%`);
     }
 
@@ -67,7 +40,7 @@ router.get("/", (req, res) => {
 router.get("/activos", (req, res) => {
     const sql = `
         SELECT COUNT(*) AS activos
-        FROM cursos
+        FROM curso
     `;
 
     db.query(sql)
@@ -81,12 +54,12 @@ router.get("/activos", (req, res) => {
 });
 
 router.post("/", function (req, res, next) {
-    const {año, division, turno, creado_por_id_admin} = req.body;
+    const {anio, division, turno} = req.body;
 
-    let sql = "INSERT INTO cursos (año, division, turno, creado_por_id_admin)";
-    sql+= " VALUES (?,?, ?, ?)";
+    let sql = "INSERT INTO curso (anio, division, turno)";
+    sql+= " VALUES (?, ?, ?)";
 
-    db.query(sql, [año, division, turno, creado_por_id_admin])
+    db.query(sql, [anio, division, turno])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -98,7 +71,7 @@ router.post("/", function (req, res, next) {
 
 router.delete ("/:curso_id", function (req, res, next) {
     const {curso_id} = req.params;
-    const sql = "DELETE FROM cursos WHERE id = ?"
+    const sql = "DELETE FROM curso WHERE id = ?"
     db.query(sql, [curso_id])
     .then(()=>{
         res.status(200).send("eliminado");
@@ -111,9 +84,9 @@ router.delete ("/:curso_id", function (req, res, next) {
 
 router.put ("/:curso_id", function(req, res, next) {
     const {curso_id} = req.params;
-    const {año, division, turno, creado_por_id_admin} = req.body;
-    const sql = "UPDATE cursos SET año = ?, division = ?, turno = ?, creado_por_id_admin = ? WHERE id = ?"
-    db.query(sql, [año, division, turno, creado_por_id_admin, curso_id])
+    const {anio, division, turno} = req.body;
+    const sql = "UPDATE curso SET anio = ?, division = ?, turno = ? WHERE id = ?"
+    db.query(sql, [anio, division, turno, curso_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })

@@ -8,10 +8,14 @@ router.get("/", function(req, res, next) {
     
     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM usuarios";
+    let sql = `
+        SELECT u.id, u.DNI, u.nombre, u.apellido, u.correo_electronico, u.id_rol, r.nombre AS rol
+        FROM usuarios u
+        JOIN roles r ON r.id = u.id_rol
+    `;
 
     if (busqueda) {
-        sql += " WHERE nombre like ?"
+        sql += " WHERE u.nombre like ?"
         busquedaParcial = `%${busqueda}%`
     }
 
@@ -28,8 +32,9 @@ router.get("/", function(req, res, next) {
 router.get("/resumen", (req, res) => {
     const sql = `
         SELECT COUNT(*) AS total
-        FROM usuarios
-        WHERE rol = 'profesor' OR rol = 'coordinador'
+        FROM usuarios u
+        JOIN roles r ON r.id = u.id_rol
+        WHERE r.nombre = 'profesor' OR r.nombre = 'coordinador'
     `;
 
     db.query(sql)
@@ -44,7 +49,10 @@ router.get("/resumen", (req, res) => {
 
 router.get("/profesores", (req, res) => {
     const sql = `
-        SELECT * FROM usuarios WHERE rol = 'profesor'
+        SELECT u.id, u.DNI, u.nombre, u.apellido, u.correo_electronico, u.id_rol, r.nombre AS rol
+        FROM usuarios u
+        JOIN roles r ON r.id = u.id_rol
+        WHERE r.nombre = 'profesor'
     `;
 
     db.query(sql)
@@ -60,7 +68,7 @@ router.get("/profesores", (req, res) => {
 router.get("/activos", (req, res) => {
     const sql = `
         SELECT COUNT(*) AS total_cursos
-        FROM cursos
+        FROM curso
     `;
 
     db.query(sql)
@@ -74,14 +82,14 @@ router.get("/activos", (req, res) => {
 });
 
 router.post("/", function (req, res, next) {
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
+    const {DNI, nombre, apellido, correo_electronico, contrasena, id_rol} = req.body;
 
-    let sql = "INSERT INTO usuarios (documento, nombre, apellido, correo, password, rol)";
+    let sql = "INSERT INTO usuarios (DNI, nombre, apellido, correo_electronico, contrasena, id_rol)";
     sql+= " VALUES (?, ?, ?, ?, ?, ?)";
 
-    const hashedPassword = hashPass(password)
+    const hashedPassword = hashPass(contrasena)
 
-    db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol])
+    db.query(sql, [DNI, nombre, apellido, correo_electronico, hashedPassword, id_rol])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -91,10 +99,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:usuario_id", function (req, res, next) {
-    const {usuario_id} = req.params;
-    const sql = "DELETE FROM usuarios WHERE id = ?"
-    db.query(sql, [usuario_id])
+router.delete ("/:usuario_DNI", function (req, res, next) {
+    const {usuario_DNI} = req.params;
+    const sql = "DELETE FROM usuarios WHERE DNI = ?"
+    db.query(sql, [usuario_DNI])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -106,12 +114,12 @@ router.delete ("/:usuario_id", function (req, res, next) {
 
 router.put ("/:usuario_id", function(req, res, next) {
     const {usuario_id} = req.params;
-    const {documento, nombre, apellido, correo, password, rol} = req.body;
-    const sql = "UPDATE usuarios SET documento = ?, nombre = ?, apellido = ?, correo = ?, password = ?, rol = ? WHERE id = ?"
+    const {DNI, nombre, apellido, correo_electronico, contrasena, id_rol} = req.body;
+    const sql = "UPDATE usuarios SET DNI = ?, nombre = ?, apellido = ?, correo_electronico = ?, contrasena = ?, id_rol = ? WHERE id = ?"
 
-    const hashedPassword = hashPass(password)
+    const hashedPassword = hashPass(contrasena)
 
-    db.query(sql, [documento, nombre, apellido, correo, hashedPassword, rol, usuario_id])
+    db.query(sql, [DNI, nombre, apellido, correo_electronico, hashedPassword, id_rol, usuario_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })

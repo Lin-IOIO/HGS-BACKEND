@@ -6,10 +6,18 @@ router.get("/", function(req, res, next) {
     
     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM materias_unicas_por_curso";
+    let sql = `
+        SELECT cm.id, cm.id_curso, cm.id_materia, cm.id_profesor,
+               m.nombre AS materia_nombre,
+               CONCAT(c.anio, '°- ', c.division, '°') AS curso_nombre,
+               c.turno AS turno
+        FROM curso_materia cm
+        JOIN materia m ON m.id = cm.id_materia
+        JOIN curso c ON c.id = cm.id_curso
+    `;
 
     if (busqueda) {
-        sql += " WHERE nombre like ?"
+        sql += " WHERE m.nombre like ?"
         busquedaParcial = `%${busqueda}%`
     }
 
@@ -24,15 +32,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    
-    console.log('Cuerpo de la solicitud (req.body):', req.body);
+    const {id_curso, id_materia, id_profesor} = req.body;
 
-    const {asignatura_id, pertenece_a_id_curso, id_profesor_asignado} = req.body;
-
-    let sql = "INSERT INTO materias_unicas_por_curso (asignatura_id, pertenece_a_id_curso, id_profesor_asignado)";
+    let sql = "INSERT INTO curso_materia (id_curso, id_materia, id_profesor)";
     sql+= " VALUES (?, ?, ?)";
 
-    db.query(sql, [asignatura_id, pertenece_a_id_curso, id_profesor_asignado])
+    db.query(sql, [id_curso, id_materia, id_profesor])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -42,10 +47,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:materia_id", function (req, res, next) {
-    const {materia_id} = req.params;
-    const sql = "DELETE FROM materias_unicas_por_curso WHERE id = ?"
-    db.query(sql, [materia_id])
+router.delete ("/:curso_materia_id", function (req, res, next) {
+    const {curso_materia_id} = req.params;
+    const sql = "DELETE FROM curso_materia WHERE id = ?"
+    db.query(sql, [curso_materia_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -55,11 +60,11 @@ router.delete ("/:materia_id", function (req, res, next) {
     })
 })
 
-router.put ("/:materia_id", function(req, res, next) {
-    const {materia_id} = req.params;
-    const {asignatura_id, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado} = req.body;
-    const sql = "UPDATE materias_unicas_por_curso SET asignatura_id = ?, pertenece_a_id_curso = ?, id_profesor_asignado = ?, id_plan_de_estudio_asignado = ? WHERE id = ?"
-    db.query(sql, [asignatura_id, pertenece_a_id_curso, id_profesor_asignado, id_plan_de_estudio_asignado, materia_id])
+router.put ("/:curso_materia_id", function(req, res, next) {
+    const {curso_materia_id} = req.params;
+    const {id_curso, id_materia, id_profesor} = req.body;
+    const sql = "UPDATE curso_materia SET id_curso = ?, id_materia = ?, id_profesor = ? WHERE id = ?"
+    db.query(sql, [id_curso, id_materia, id_profesor, curso_materia_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })

@@ -5,20 +5,24 @@ const {TOKEN_SECRET} = process.env
 const db = require('../../conexion')
 
 router.post('/', function(req, res, next) {
-    const {documento, password} = req.body;
-    let sql = "SELECT * FROM usuarios "
-    sql += "WHERE documento = ?"
+    const {DNI, contrasena} = req.body;
+    let sql = `
+        SELECT u.id, u.DNI, u.nombre, u.apellido, u.contrasena, r.nombre AS rol
+        FROM usuarios u
+        JOIN roles r ON r.id = u.id_rol
+        WHERE u.DNI = ?
+    `;
 
-    db.query(sql, [documento])
+    db.query(sql, [DNI])
     .then(([usuarios])=>{
         if(usuarios && usuarios.length === 1){
             const usuario = usuarios[0]
-            if (verificarPass(password, usuario.password)){
+            if (verificarPass(contrasena, usuario.contrasena)){
                 const token = generarToken(TOKEN_SECRET, 8, {id:usuario.id, usuario:usuario.nombre+" "+usuario.apellido, rol:usuario.rol})
                 res.status(200).json({status: "ok", token})
             }
             else {
-                console.log("Usuario no encontrado ", verificarPass(password, usuario.password))
+                console.log("Usuario no encontrado ", verificarPass(contrasena, usuario.contrasena))
                 res.status(401).send('Usuario o contraseña incorrectos 2')
             }
         }

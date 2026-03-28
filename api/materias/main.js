@@ -6,16 +6,16 @@ router.get("/", function(req, res, next) {
     
     let busquedaParcial = busqueda;
 
-    let sql = "SELECT * FROM tareas";
+    let sql = "SELECT * FROM materia";
 
     if (busqueda) {
-        sql += " WHERE titulo like ?"
+        sql += " WHERE nombre like ?"
         busquedaParcial = `%${busqueda}%`
     }
 
     db.query(sql, [busquedaParcial])
     .then (([respuesta])=> {
-        res.json({respuesta})
+        res.json(respuesta)
     })
     .catch((error)=> {
         console.error(error);
@@ -24,12 +24,12 @@ router.get("/", function(req, res, next) {
 })
 
 router.post("/", function (req, res, next) {
-    const {titulo, consignas, fecha_inicio, fecha_fin, creado_por_id_profesor, pertenece_a_id_materia} = req.body;
+    const {nombre} = req.body;
 
-    let sql = "INSERT INTO tareas (titulo, consignas, fecha_inicio, fecha_fin, creado_por_id_profesor, pertenece_a_id_materia)";
-    sql+= " VALUES (?, ?, ?, ?, ?, ?)";
+    let sql = "INSERT INTO materia (nombre)";
+    sql+= " VALUES (?)";
 
-    db.query(sql, [titulo, consignas, fecha_inicio, fecha_fin, creado_por_id_profesor, pertenece_a_id_materia])
+    db.query(sql, [nombre])
     .then(()=> {
         res.status(201).send("Guardado");
     })
@@ -39,10 +39,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:tarea_id", function (req, res, next) {
-    const {tarea_id} = req.params;
-    const sql = "DELETE FROM tareas WHERE id = ?"
-    db.query(sql, [tarea_id])
+router.delete ("/:materia_id", function (req, res, next) {
+    const {materia_id} = req.params;
+    const sql = "DELETE FROM materia WHERE id = ?"
+    db.query(sql, [materia_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -52,11 +52,11 @@ router.delete ("/:tarea_id", function (req, res, next) {
     })
 })
 
-router.put ("/:tarea_id", function(req, res, next) {
-    const {tarea_id} = req.params;
-    const {titulo, consignas, fecha_inicio, fecha_fin} = req.body;
-    const sql = "UPDATE tareas SET titulo = ?, consignas = ?, fecha_inicio = ?, fecha_fin = ? WHERE id = ?"
-    db.query(sql, [titulo, consignas, fecha_inicio, fecha_fin, tarea_id])
+router.put ("/:materia_id", function(req, res, next) {
+    const {materia_id} = req.params;
+    const {nombre} = req.body;
+    const sql = "UPDATE materia SET nombre = ? WHERE id = ?"
+    db.query(sql, [nombre, materia_id])
     .then(()=>{
         res.status(200).send("actualizado")
     })
