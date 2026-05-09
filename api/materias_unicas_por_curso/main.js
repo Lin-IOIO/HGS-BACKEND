@@ -9,7 +9,7 @@ router.get("/", function(req, res, next) {
     let sql = `
         SELECT cm.id, cm.id_curso, cm.id_materia, cm.id_profesor,
                m.nombre AS materia_nombre,
-               CONCAT(c.anio, '°- ', c.division, '°') AS curso_nombre,
+               CONCAT(c.anio, 'Â° ', c.division) AS curso_nombre,
                c.turno AS turno
         FROM curso_materia cm
         JOIN materia m ON m.id = cm.id_materia

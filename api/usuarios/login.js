@@ -6,6 +6,7 @@ const db = require('../../conexion')
 
 router.post('/', function(req, res, next) {
     const {DNI, contrasena} = req.body;
+    console.log(req.body)
     let sql = `
         SELECT u.id, u.DNI, u.nombre, u.apellido, u.contrasena, r.nombre AS rol
         FROM usuarios u
@@ -28,6 +29,7 @@ router.post('/', function(req, res, next) {
         }
         else {
             console.log("Usuario no encontrado")
+            console.log(usuarios)
             res.status(401).send('Usuario o contraseña incorrectos 1')
         }
     })

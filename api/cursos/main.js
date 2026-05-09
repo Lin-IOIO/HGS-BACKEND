@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
             c.anio AS anio_id,
             c.division AS division_id,
             c.turno AS turno_id,
-            CONCAT(c.anio, '°- ', c.division, '°') AS nombre,
+            CONCAT(c.anio, 'Â° ', c.division) AS nombre,
             c.turno AS turno,
             COUNT(m.id) AS materias
         FROM curso c

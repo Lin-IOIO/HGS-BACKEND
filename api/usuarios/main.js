@@ -99,10 +99,10 @@ router.post("/", function (req, res, next) {
     })
 })
 
-router.delete ("/:usuario_DNI", function (req, res, next) {
-    const {usuario_DNI} = req.params;
-    const sql = "DELETE FROM usuarios WHERE DNI = ?"
-    db.query(sql, [usuario_DNI])
+router.delete ("/:usuario_id", function (req, res, next) {
+    const {usuario_id} = req.params;
+    const sql = "DELETE FROM usuarios WHERE id = ?"
+    db.query(sql, [usuario_id])
     .then(()=>{
         res.status(200).send("eliminado");
     })
@@ -115,11 +115,21 @@ router.delete ("/:usuario_DNI", function (req, res, next) {
 router.put ("/:usuario_id", function(req, res, next) {
     const {usuario_id} = req.params;
     const {DNI, nombre, apellido, correo_electronico, contrasena, id_rol} = req.body;
-    const sql = "UPDATE usuarios SET DNI = ?, nombre = ?, apellido = ?, correo_electronico = ?, contrasena = ?, id_rol = ? WHERE id = ?"
+    const baseSql = "UPDATE usuarios SET DNI = ?, nombre = ?, apellido = ?, correo_electronico = ?, id_rol = ?"
+    const params = [DNI, nombre, apellido, correo_electronico, id_rol]
 
-    const hashedPassword = hashPass(contrasena)
+    let sql = baseSql
 
-    db.query(sql, [DNI, nombre, apellido, correo_electronico, hashedPassword, id_rol, usuario_id])
+    if (contrasena && String(contrasena).trim() !== '') {
+        const hashedPassword = hashPass(contrasena)
+        sql += ", contrasena = ?"
+        params.push(hashedPassword)
+    }
+
+    sql += " WHERE id = ?"
+    params.push(usuario_id)
+
+    db.query(sql, params)
     .then(()=>{
         res.status(200).send("actualizado")
     })
